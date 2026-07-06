@@ -2,16 +2,17 @@
 <html lang="zh-HK">
 
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QZTXDHJVXW"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-QZTXDHJVXW');
-</script>
-    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZTXDHJVXW"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-QZTXDHJVXW');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>禤師傅私房菜 • 精選套餐</title>
@@ -201,6 +202,12 @@
 
         function selectTier(tier) {
             selectedTier = tier;
+
+            // 新增 GA4 事件追蹤
+            gtag('event', 'configurator_start', {
+                'tier': tier === 1 ? '458' : '558'
+            });
+
             document.getElementById('tier1').classList.add('dimmed');
             document.getElementById('tier2').classList.add('dimmed');
             document.getElementById('tier' + tier).classList.remove('dimmed');
@@ -456,6 +463,13 @@
             const mainRadio = document.querySelector(`input[name="${category}-main"]:checked`);
 
             if (mainRadio) {
+
+                // 在 updateCategoryStatus 函數中，找到 if (mainRadio) { 這段後面加入
+                gtag('event', 'category_selected', {
+                    'category': category,
+                    'selected_item': mainValue
+                });
+
                 const mainValue = mainRadio.value;
 
                 // 決定正確的 method name 和 methods container id
@@ -594,6 +608,12 @@
         }
 
         function generateSummary() {
+
+            gtag('event', 'summary_generated', {
+                'tier': selectedTier === 1 ? '458' : '558',
+                'total_selected': selectedItems.length
+            });
+            
             if (!selectedTier) {
                 alert("請先選擇價位");
                 return;
