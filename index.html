@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>禤師傅私房菜 • 精選套餐</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .tier-card {
+            transition: all 0.3s ease;
+        }
+
+        .tier-card.selected {
+            border-color: #c2410f;
+            box-shadow: 0 0 0 3px rgba(194, 65, 15, 0.2);
+        }
+
+        .tier-card.dimmed {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .category-header {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1f2937;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+            margin-bottom: 12px;
+        }
+
+        .menu-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            border: 1px solid #e5e7eb;
+        }
+
+        .menu-row:hover {
+            background-color: #f8fafc;
+        }
+
+        .menu-row.selected {
+            border-color: #c2410f;
+            background-color: #fff7ed;
+        }
+
+        /* === 已選 0/1 藍色樣式 === */
+        .count-badge {
+            background-color: #dcfce7;
+            color: #166534;
+            font-size: 0.875rem;
+            padding: 2px 10px;
+            border-radius: 9999px;
+        }
+
+        /* 未選做法提示加大 */
+        .method-prompt {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="max-w-5xl mx-auto p-8">
+
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">禤師傅私房菜</h1>
+            <p class="text-gray-600 mt-1">精選套餐配置器（最少 2 人起）</p>
+        </div>
+
+        <!-- SECTION A: 價位選擇 -->
+        <div id="sectionA">
+            <h2 class="text-xl font-bold mb-4">Step 1：選擇套餐價位</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
+
+                <!-- $458 -->
+                <div onclick="selectTier(1)"
+                    class="tier-card border-2 border-gray-200 hover:border-orange-500 rounded-3xl p-6 cursor-pointer bg-white"
+                    id="tier1">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-4xl font-bold text-orange-600">$458</span>
+                        <span class="text-2xl font-medium text-gray-500">/人</span>
+                    </div>
+                    <div class="mt-2"><span class="text-2xl font-semibold text-gray-800">共 5 款</span></div>
+                    <div class="mt-4 text-sm text-gray-600">A + B + C + D + E（每類 1 項）</div>
+                </div>
+
+                <!-- $558 升級版 -->
+                <div onclick="selectTier(2)"
+                    class="tier-card border-2 border-gray-200 hover:border-orange-500 rounded-3xl p-6 cursor-pointer bg-white"
+                    id="tier2">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-4xl font-bold text-orange-600">$558</span>
+                        <span class="text-2xl font-medium text-gray-500">/人</span>
+                    </div>
+                    <div class="mt-2"><span class="text-2xl font-semibold text-gray-800">共 7 款</span></div>
+                    <div class="mt-4 text-sm text-gray-600 font-medium leading-tight">
+                        A、B、C、D、E 各選 1 項<br>
+                        + 額外 B 及 C 各 1 項<br>
+                        <span class="text-xs text-orange-600">（多 2 道菜，適合 6 人以上或想食得豐富）</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION B -->
+        <div id="sectionB" class="hidden mt-10">
+            <div class="flex justify-end mb-3">
+                <button onclick="resetSelection()"
+                    class="flex items-center gap-2 px-4 py-2 text-sm rounded-xl border border-gray-300 hover:bg-gray-100 text-gray-600">
+                    <i class="fa-solid fa-undo"></i>
+                    <span>重新選擇價位</span>
+                </button>
+            </div>
+
+            <h2 class="text-xl font-bold mb-1">Step 2：選擇菜式</h2>
+            <div id="quotaInfo" class="text-sm text-gray-600 mb-6"></div>
+
+            <div id="foodSelectionArea" class="space-y-10"></div>
+
+            <!-- 已選菜式提醒 -->
+            <div class="my-4 p-3 bg-gray-100 border border-gray-300 rounded-2xl text-center">
+                <span class="font-semibold text-gray-700">已選菜式：</span>
+                <span id="total-selected" class="font-bold text-orange-600 text-lg">0 / 5</span>
+            </div>
+
+            <!-- 客人資訊 -->
+            <div class="mt-2 p-6 bg-white border border-gray-200 rounded-2xl">
+                <h3 class="font-semibold mb-4">預約資訊（選填）</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm mb-1">姓名</label>
+                        <input id="customerName" type="text" class="w-full border rounded-xl px-4 py-2"
+                            placeholder="陳先生">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">電話</label>
+                        <input id="customerPhone" type="text" class="w-full border rounded-xl px-4 py-2"
+                            placeholder="9123 4567">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">預約日期</label>
+                        <input id="bookingDate" type="date" class="w-full border rounded-xl px-4 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">人數</label>
+                        <input id="pax" type="number" class="w-full border rounded-xl px-4 py-2" value="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 生成摘要按鈕 -->
+            <div class="mt-6 text-center">
+                <button onclick="generateSummary()"
+                    class="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-2xl font-semibold flex items-center gap-2 mx-auto">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>生成 WhatsApp 訂單摘要</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 摘要 Modal -->
+        <div id="summaryModal"
+            class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-lg mx-4">
+                <h3 class="text-lg font-bold mb-4">訂單摘要</h3>
+                <textarea id="summaryText" class="w-full h-80 border rounded-xl p-4 text-sm font-mono"
+                    readonly></textarea>
+
+                <div class="flex gap-3 mt-4">
+                    <button onclick="copySummary()"
+                        class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-xl font-medium">
+                        複製到剪貼簿
+                    </button>
+                    <button onclick="closeModal()" class="flex-1 border py-2.5 rounded-xl font-medium">
+                        關閉
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let selectedTier = null;
+
+        function selectTier(tier) {
+            selectedTier = tier;
+            document.getElementById('tier1').classList.add('dimmed');
+            document.getElementById('tier2').classList.add('dimmed');
+            document.getElementById('tier' + tier).classList.remove('dimmed');
+            document.getElementById('tier' + tier).classList.add('selected');
+
+            document.getElementById('sectionB').classList.remove('hidden');
+            document.getElementById('sectionB').scrollIntoView({ behavior: 'smooth' });
+            generateFoodSelection(tier);
+        }
+
+        function generateFoodSelection(tier) {
+            const container = document.getElementById('foodSelectionArea');
+            container.innerHTML = '';
+            let html = '';
+
+            // ========== A ==========
+            html += `
+                <div>
+                    <div class="category-header flex items-center gap-2">
+                        A. 首選頂級海鮮 
+                        <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="A-count">已選 0/1</span>
+                        <span id="A-method-prompt" class="method-prompt text-red-500 ml-1 hidden">（未選做法）</span>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="menu-row cursor-pointer">
+                            <input type="radio" name="A-main" value="龍蝦" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'A')">
+                            <span class="font-medium">龍蝦</span>
+                        </label>
+                        <div id="龍蝦-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                            <label class="flex items-center gap-2 cursor-pointer pl-1">
+                                <input type="radio" name="龍蝦-method" class="w-4 h-4" value="蒜蓉蒸" onchange="updateCategoryStatus('A')"><span>蒜蓉蒸</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer pl-1">
+                                <input type="radio" name="龍蝦-method" class="w-4 h-4" value="芝士焗" onchange="updateCategoryStatus('A')"><span>芝士焗</span>
+                            </label>
+                        </div>
+
+                        <label class="menu-row cursor-pointer">
+                            <input type="radio" name="A-main" value="皇牌巨型瀨尿蝦" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'A')">
+                            <span class="font-medium">皇牌巨型瀨尿蝦</span>
+                        </label>
+                        <div id="皇牌巨型瀨尿蝦-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                            <label class="flex items-center gap-2 cursor-pointer pl-1">
+                                <input type="radio" name="瀨尿蝦-method" class="w-4 h-4" value="椒鹽" onchange="updateCategoryStatus('A')"><span>椒鹽</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer pl-1">
+                                <input type="radio" name="瀨尿蝦-method" class="w-4 h-4" value="避風塘" onchange="updateCategoryStatus('A')"><span>避風塘</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // ========== B ==========
+            html += `<div><div class="category-header flex items-center gap-2">B. 主要海鮮珍選 <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="B-count">已選 0/1</span><span id="B-method-prompt" class="method-prompt text-red-500 ml-1 hidden">（未選做法）</span></div><div class="space-y-2">`;
+            const bItems = [
+                { name: "蒜蓉粉絲蒸扇貝", methods: [] },
+                { name: "鮮蟹系列", methods: ["鹽焗", "薑蔥", "豉椒", "避風塘"] },
+                { name: "鮑魚系列", methods: ["冰震", "果皮", "薑蔥炒", "豉汁"] }
+            ];
+            bItems.forEach(item => {
+                html += `<div><label class="menu-row cursor-pointer"><input type="radio" name="B-main" value="${item.name}" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'B')"><span class="font-medium">${item.name}</span></label>`;
+                if (item.methods.length > 0) {
+                    html += `<div id="${item.name}-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">`;
+                    item.methods.forEach(m => {
+                        html += `<label class="flex items-center gap-2 cursor-pointer pl-1"><input type="radio" name="${item.name}-method" class="w-4 h-4" value="${m}" onchange="updateCategoryStatus('B')"><span>${m}</span></label>`;
+                    });
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            });
+            html += `</div></div>`;
+
+            // ========== C 類別處理 ==========
+            if (tier === 2) {
+                // $558 模式：顯示 C1 + C2
+                const cItems = [
+                    { name: "油鹽水浸北寄貝", methods: [] },
+                    { name: "辣酒煮花螺", methods: [] },
+                    { name: "油浸筍殼魚", methods: [] },
+                    { name: "花甲系列", methods: ["油鹽水", "豉椒"] },
+                    { name: "生蠔系列", methods: ["砵酒", "薑蔥", "酥炸"] }
+                ];
+
+                // C1
+                html += `<div><div class="category-header flex items-center gap-2">
+    C1. 時令海味匠心 
+    <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="C1-count">已選 0/1</span>
+    <span id="C1-method-prompt" class="method-prompt text-red-500 ml-1 hidden">（未選做法）</span>
+</div><div class="space-y-2">`;
+                cItems.forEach(item => {
+                    html += `<div><label class="menu-row cursor-pointer"><input type="radio" name="C1-main" value="${item.name}" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'C1')"><span class="font-medium">${item.name}</span></label>`;
+                    if (item.methods.length > 0) {
+                        html += `<div id="${item.name}-C1-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">`;
+                        item.methods.forEach(m => {
+                            html += `<label class="flex items-center gap-2 cursor-pointer pl-1"><input type="radio" name="${item.name}-C1-method" class="w-4 h-4" value="${m}" onchange="updateCategoryStatus('C1')"><span>${m}</span></label>`;
+                        });
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
+
+                // C2
+                html += `<div><div class="category-header flex items-center gap-2">
+    C2. 時令海味匠心 
+    <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="C2-count">已選 0/1</span>
+    <span id="C2-method-prompt" class="method-prompt text-red-500 ml-1 hidden">（未選做法）</span>
+</div><div class="space-y-2">`;
+                cItems.forEach(item => {
+                    html += `<div><label class="menu-row cursor-pointer"><input type="radio" name="C2-main" value="${item.name}" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'C2')"><span class="font-medium">${item.name}</span></label>`;
+                    if (item.methods.length > 0) {
+                        html += `<div id="${item.name}-C2-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">`;
+                        item.methods.forEach(m => {
+                            html += `<label class="flex items-center gap-2 cursor-pointer pl-1"><input type="radio" name="${item.name}-C2-method" class="w-4 h-4" value="${m}" onchange="updateCategoryStatus('C2')"><span>${m}</span></label>`;
+                        });
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
+
+            } else {
+                // $458 模式：維持原本的 C（完全不動）
+                html += `<div><div class="category-header flex items-center gap-2">
+    C. 時令海味匠心 
+    <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="C-count">已選 0/1</span>
+    <span id="C-method-prompt" class="method-prompt text-red-500 ml-1 hidden">（未選做法）</span>
+</div><div class="space-y-2">`;
+
+                const cItems = [
+                    { name: "油鹽水浸北寄貝", methods: [] },
+                    { name: "辣酒煮花螺", methods: [] },
+                    { name: "油浸筍殼魚", methods: [] },
+                    { name: "花甲系列", methods: ["油鹽水", "豉椒"] },
+                    { name: "生蠔系列", methods: ["砵酒", "薑蔥", "酥炸"] }
+                ];
+
+                cItems.forEach(item => {
+                    html += `<div><label class="menu-row cursor-pointer"><input type="radio" name="C-main" value="${item.name}" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'C')"><span class="font-medium">${item.name}</span></label>`;
+                    if (item.methods.length > 0) {
+                        html += `<div id="${item.name}-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">`;
+                        item.methods.forEach(m => {
+                            html += `<label class="flex items-center gap-2 cursor-pointer pl-1"><input type="radio" name="${item.name}-method" class="w-4 h-4" value="${m}" onchange="updateCategoryStatus('C')"><span>${m}</span></label>`;
+                        });
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            // ========== D 類別處理 ==========
+            if (tier === 2) {
+                // $558 模式：顯示 D1 + D2
+                const dItems = [
+                    { name: "師傅招牌咕嚕肉", methods: [] },
+                    { name: "蒜香鮮排骨", methods: [] },
+                    { name: "椒鹽麻辣魚腩煲", methods: [] },
+                    { name: "牛仔骨系列", methods: ["椒鹽", "避風塘"] },
+                    { name: "椒鹽九肚魚 / 鮮魷系列", methods: ["九肚魚", "鮮魷", "雙拼"] }
+                ];
+
+                // D1
+                html += `<div><div class="category-header flex items-center gap-2">
+    D1. 禤師傅私房小炒 
+    <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="D1-count">已選 0/1</span>
+    <span id="D1-method-prompt" class="method-prompt text-red-500 ml-1 hidden">（未選做法）</span>
+</div><div class="space-y-2">`;
+                dItems.forEach(item => {
+                    html += `<div><label class="menu-row cursor-pointer"><input type="radio" name="D1-main" value="${item.name}" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'D1')"><span class="font-medium">${item.name}</span></label>`;
+                    if (item.methods.length > 0) {
+                        html += `<div id="${item.name}-D1-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">`;
+                        item.methods.forEach(m => {
+                            html += `<label class="flex items-center gap-2 cursor-pointer pl-1"><input type="radio" name="${item.name}-D1-method" class="w-4 h-4" value="${m}" onchange="updateCategoryStatus('D1')"><span>${m}</span></label>`;
+                        });
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
+
+                // D2
+                html += `<div class="category-header flex items-center gap-2">
+    D2. 禤師傅私房小炒 
+    <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="D2-count">已選 0/1</span>
+    <span id="D2-method-prompt" class="method-prompt text-red-500 ml-1 hidden">（未選做法）</span>
+</div><div class="space-y-2">`;
+                dItems.forEach(item => {
+                    html += `<div><label class="menu-row cursor-pointer"><input type="radio" name="D2-main" value="${item.name}" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'D2')"><span class="font-medium">${item.name}</span></label>`;
+                    if (item.methods.length > 0) {
+                        html += `<div id="${item.name}-D2-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">`;
+                        item.methods.forEach(m => {
+                            html += `<label class="flex items-center gap-2 cursor-pointer pl-1"><input type="radio" name="${item.name}-D2-method" class="w-4 h-4" value="${m}" onchange="updateCategoryStatus('D2')"><span>${m}</span></label>`;
+                        });
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
+
+            } else {
+                // $458 模式：維持原本的 D（完全不動）
+                html += `<div><div class="category-header flex items-center gap-2">
+    D. 禤師傅私房小炒 
+    <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="D-count">已選 0/1</span>
+    <span id="D-method-prompt" class="method-prompt text-red-500 ml-1 hidden">（未選做法）</span>
+</div><div class="space-y-2">`;
+
+                const dItems = [
+                    { name: "師傅招牌咕嚕肉", methods: [] },
+                    { name: "蒜香鮮排骨", methods: [] },
+                    { name: "椒鹽麻辣魚腩煲", methods: [] },
+                    { name: "牛仔骨系列", methods: ["椒鹽", "避風塘"] },
+                    { name: "椒鹽九肚魚 / 鮮魷系列", methods: ["九肚魚", "鮮魷", "雙拼"] }
+                ];
+
+                dItems.forEach(item => {
+                    html += `<div><label class="menu-row cursor-pointer"><input type="radio" name="D-main" value="${item.name}" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'D')"><span class="font-medium">${item.name}</span></label>`;
+                    if (item.methods.length > 0) {
+                        html += `<div id="${item.name}-methods" class="hidden ml-8 mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm">`;
+                        item.methods.forEach(m => {
+                            html += `<label class="flex items-center gap-2 cursor-pointer pl-1"><input type="radio" name="${item.name}-method" class="w-4 h-4" value="${m}" onchange="updateCategoryStatus('D')"><span>${m}</span></label>`;
+                        });
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            // ========== E ==========
+            html += `<div><div class="category-header flex items-center gap-2">E. 禤師傅養生時蔬 <span class="count-badge text-xs px-2 py-0.5 rounded-full" id="E-count">已選 0/1</span></div><div class="space-y-1">`;
+            ["油鹽水浸菜心", "薑汁炒芥蘭", "馬拉盞通菜", "瑤柱扒豆苗（人均 +$20）"].forEach(item => {
+                html += `<label class="menu-row cursor-pointer"><input type="radio" name="E" class="mr-3 w-4 h-4" value="${item}" onchange="updateCategoryStatus('E')"><span>${item}</span></label>`;
+            });
+            html += `</div></div>`;
+
+            container.innerHTML = html;
+            updateAllCounts();
+        }
+
+        // ==================== Helper Function ====================
+
+        function updateCategoryStatus(category) {
+            const countEl = document.getElementById(category + '-count');
+            const promptEl = document.getElementById(category + '-method-prompt');
+            if (!countEl) return;
+
+            let count = 0;
+            let showPrompt = false;
+
+            const mainRadio = document.querySelector(`input[name="${category}-main"]:checked`);
+
+            if (mainRadio) {
+                const mainValue = mainRadio.value;
+
+                // 決定正確的 method name 和 methods container id
+                let methodName = mainValue + '-method';
+                let methodsId = mainValue + '-methods';
+                // === 針對 A 類別的特殊處理（最小修改版）===
+                if (category === 'A' && mainValue === '皇牌巨型瀨尿蝦') {
+                    methodName = '瀨尿蝦-method';
+                    methodsId = '皇牌巨型瀨尿蝦-methods';
+                }
+
+                console.log("=== A DEBUG ===");
+                console.log("category:", category);
+                console.log("mainValue:", mainValue);
+                console.log("methodName:", methodName);
+                console.log("methodsId:", methodsId);
+
+                if (category === 'C1') {
+                    methodName = mainValue + '-C1-method';
+                    methodsId = mainValue + '-C1-methods';
+                }
+                if (category === 'C2') {
+                    methodName = mainValue + '-C2-method';
+                    methodsId = mainValue + '-C2-methods';
+                }
+                if (category === 'D1') {
+                    methodName = mainValue + '-D1-method';
+                    methodsId = mainValue + '-D1-methods';
+                }
+                if (category === 'D2') {
+                    methodName = mainValue + '-D2-method';
+                    methodsId = mainValue + '-D2-methods';
+                }
+
+                const methodsContainer = document.getElementById(methodsId);
+
+                if (methodsContainer) {
+                    // 有烹調方法可選的項目
+                    const methodSelected = document.querySelector(`input[name="${methodName}"]:checked`);
+                    if (methodSelected) {
+                        count = 1;
+                        showPrompt = false;
+                        console.log('Category:', category, 'mainValue:', mainValue, 'methodsId:', methodsId, 'methodsContainer:', methodsContainer);
+                    } else {
+                        count = 0;
+                        showPrompt = true;
+                    }
+                } else {
+                    // 沒有烹調方法的項目
+                    count = 1;
+                    showPrompt = false;
+                }
+            }
+
+            // 更新顯示
+            countEl.textContent = `已選 ${count}/1`;
+
+            if (promptEl) {
+                if (showPrompt) {
+                    promptEl.classList.remove('hidden');
+                } else {
+                    promptEl.classList.add('hidden');
+                }
+            }
+
+            updateTotalCount();
+        }
+
+        function selectMainItem(radio, category) {
+            const parentContainer = radio.closest('.space-y-2');
+            if (parentContainer) {
+                parentContainer.querySelectorAll('.menu-row').forEach(row => row.classList.remove('selected'));
+            }
+
+            const currentRow = radio.closest('.menu-row');
+            if (currentRow) currentRow.classList.add('selected');
+
+            if (parentContainer) {
+                parentContainer.querySelectorAll('[id$="-methods"]').forEach(el => el.classList.add('hidden'));
+            }
+
+            // === 重點修改：根據 category 決定正確的 methods div ID ===
+            let methodsId = radio.value + '-methods';
+
+            if (category === 'C1') {
+                methodsId = radio.value + '-C1-methods';
+            }
+            if (category === 'C2') {
+                methodsId = radio.value + '-C2-methods';
+            }
+            if (category === 'D1') {
+                methodsId = radio.value + '-D1-methods';
+            }
+            if (category === 'D2') {
+                methodsId = radio.value + '-D2-methods';
+            }
+
+            const methodsDiv = document.getElementById(methodsId);
+            if (methodsDiv) {
+                methodsDiv.classList.remove('hidden');
+            }
+
+            updateCategoryStatus(category);
+        }
+
+        function updateAllCounts() {
+            ['A', 'B', 'C', 'D', 'E'].forEach(cat => {
+                updateCategoryStatus(cat);
+            });
+        }
+
+        function updateTotalCount() {
+            const totalEl = document.getElementById('total-selected');
+            if (!totalEl || !selectedTier) return;
+
+            let total = 0;
+
+            if (document.querySelector('input[name="A-main"]:checked')) total++;
+            if (document.querySelector('input[name="B-main"]:checked')) total++;
+            if (document.querySelector('input[name="E"]:checked')) total++;
+
+            if (selectedTier === 2) {
+                // $558 模式：計算 C1 + C2 + D1 + D2
+                if (document.querySelector('input[name="C1-main"]:checked')) total++;
+                if (document.querySelector('input[name="C2-main"]:checked')) total++;
+                if (document.querySelector('input[name="D1-main"]:checked')) total++;
+                if (document.querySelector('input[name="D2-main"]:checked')) total++;
+            } else {
+                // $458 模式：維持原本計算 C 和 D
+                if (document.querySelector('input[name="C-main"]:checked')) total++;
+                if (document.querySelector('input[name="D-main"]:checked')) total++;
+            }
+
+            const max = selectedTier === 2 ? 7 : 5;
+            totalEl.textContent = `${total} / ${max}`;
+        }
+
+        function generateSummary() {
+            if (!selectedTier) {
+                alert("請先選擇價位");
+                return;
+            }
+
+            const price = selectedTier === 1 ? "$458" : "$558";
+            const version = selectedTier === 1 ? "基礎版（5道菜）" : "升級版（7道菜）";
+
+            let selectedItems = [];
+
+            // A 的處理保持不動（已經有特殊處理）
+            const aMain = document.querySelector('input[name="A-main"]:checked');
+            if (aMain) {
+                let aMethodName = "";
+                if (aMain.value === "龍蝦") aMethodName = "龍蝦-method";
+                if (aMain.value === "皇牌巨型瀨尿蝦") aMethodName = "瀨尿蝦-method";
+
+                const aMethod = aMethodName ? document.querySelector(`input[name="${aMethodName}"]:checked`) : null;
+                selectedItems.push(`A. ${aMain.value}（${aMethod ? aMethod.value : '未選'}）`);
+            }
+
+            // === Step 1 修改：根據 tier 決定要抓哪些類別 ===
+            let categoriesToProcess = ['B'];
+
+            if (selectedTier === 2) {
+                // $558 模式
+                categoriesToProcess = ['B', 'C1', 'C2', 'D1', 'D2'];
+            } else {
+                // $458 模式
+                categoriesToProcess = ['B', 'C', 'D'];
+            }
+
+            categoriesToProcess.forEach(cat => {
+                const main = document.querySelector(`input[name="${cat}-main"]:checked`);
+                if (main) {
+                    // === Step 2：根據類別決定正確的做法名稱 ===
+                    let methodName = `${main.value}-method`;
+
+                    if (cat === 'C1') methodName = `${main.value}-C1-method`;
+                    if (cat === 'C2') methodName = `${main.value}-C2-method`;
+                    if (cat === 'D1') methodName = `${main.value}-D1-method`;
+                    if (cat === 'D2') methodName = `${main.value}-D2-method`;
+
+                    const method = document.querySelector(`input[name="${methodName}"]:checked`);
+                    selectedItems.push(`${cat}. ${main.value}（${method ? method.value : '未選'}）`);
+                }
+            });
+
+            const e = document.querySelector('input[name="E"]:checked');
+            if (e) {
+                selectedItems.push(`E. ${e.value}`);
+            }
+
+            const name = document.getElementById('customerName').value || '未填寫';
+            const phone = document.getElementById('customerPhone').value || '未填寫';
+            const date = document.getElementById('bookingDate').value || '未填寫';
+            const pax = document.getElementById('pax').value || '0';
+
+            let summary = `禤師傅私房菜 精選套餐預訂\n\n`;
+            summary += `價位：${price} / 人（${version}）\n`;
+            summary += `人數：${pax}\n`;
+            summary += `日期：${date}\n\n`;
+            summary += `【已選菜式】\n`;
+            selectedItems.forEach(item => summary += `${item}\n`);
+            summary += `\n【注意事項】\n`;
+            summary += `• A類別（龍蝦 / 瀨尿蝦）大小會有市場調整價\n`;
+            summary += `• 預約訂金：$500–1000（FPS / PayMe）\n\n`;
+            summary += `姓名：${name}\n`;
+            summary += `電話：${phone}\n`;
+
+            document.getElementById('summaryText').value = summary;
+            document.getElementById('summaryModal').classList.remove('hidden');
+            navigator.clipboard.writeText(summary).catch(() => { });
+        }
+
+        function copySummary() {
+            const text = document.getElementById('summaryText').value;
+            navigator.clipboard.writeText(text).then(() => alert('已複製到剪貼簿！'));
+        }
+
+        function closeModal() {
+            document.getElementById('summaryModal').classList.add('hidden');
+        }
+
+        function resetSelection() {
+            selectedTier = null;
+            document.getElementById('tier1').classList.remove('dimmed', 'selected');
+            document.getElementById('tier2').classList.remove('dimmed', 'selected');
+            document.getElementById('sectionB').classList.add('hidden');
+            document.getElementById('foodSelectionArea').innerHTML = '';
+        }
+    </script>
+</body>
+
+</html>
