@@ -463,7 +463,7 @@
 
             if (mainRadio) {
                 const mainValue = mainRadio.value;
-                
+
                 // === GA4 事件追蹤：記錄使用者選擇了哪個類別 ===
                 gtag('event', 'category_selected', {
                     'category': category,
@@ -610,6 +610,12 @@
                 alert("請先選擇價位");
                 return;
             }
+
+            // === GA4 事件追蹤：記錄使用者生成訂單摘要 ===
+            gtag('event', 'summary_generated', {
+                'tier': selectedTier === 1 ? '458' : '558',
+                'total_dishes': selectedItems.length
+            });
 
             const price = selectedTier === 1 ? "$458" : "$558";
             const version = selectedTier === 1 ? "基礎版（5道菜）" : "升級版（7道菜）";
