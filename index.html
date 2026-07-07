@@ -3,15 +3,15 @@
 
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QZTXDHJVXW"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZTXDHJVXW"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-  gtag('config', 'G-QZTXDHJVXW');
-</script>
-    
+        gtag('config', 'G-QZTXDHJVXW');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>禤師傅私房菜 • 精選套餐</title>
@@ -201,6 +201,12 @@
 
         function selectTier(tier) {
             selectedTier = tier;
+            
+            // === GA4 事件追蹤：記錄使用者開始使用配置器 ===
+            gtag('event', 'configurator_start', {
+                'tier': tier === 1 ? '458' : '558'
+            });
+            
             document.getElementById('tier1').classList.add('dimmed');
             document.getElementById('tier2').classList.add('dimmed');
             document.getElementById('tier' + tier).classList.remove('dimmed');
