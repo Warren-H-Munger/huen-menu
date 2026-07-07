@@ -459,6 +459,17 @@
             let count = 0;
             let showPrompt = false;
 
+            // === 針對 E 類別的特殊處理 ===
+            if (category === 'E') {
+                const eSelected = document.querySelector('input[name="E"]:checked');
+                count = eSelected ? 1 : 0;
+                countEl.textContent = `已選 ${count}/1`;
+
+                if (promptEl) promptEl.classList.add('hidden');
+                updateTotalCount();
+                return;
+            }
+
             const mainRadio = document.querySelector(`input[name="${category}-main"]:checked`);
 
             if (mainRadio) {
@@ -641,7 +652,6 @@
             categoriesToProcess.forEach(cat => {
                 const main = document.querySelector(`input[name="${cat}-main"]:checked`);
                 if (main) {
-                    // === Step 2：根據類別決定正確的做法名稱 ===
                     let methodName = `${main.value}-method`;
 
                     if (cat === 'C1') methodName = `${main.value}-C1-method`;
@@ -650,7 +660,14 @@
                     if (cat === 'D2') methodName = `${main.value}-D2-method`;
 
                     const method = document.querySelector(`input[name="${methodName}"]:checked`);
-                    selectedItems.push(`${cat}. ${main.value}（${method ? method.value : '未選'}）`);
+
+                    // === 修改重點：判斷是否有烹調方法 ===
+                    if (method) {
+                        selectedItems.push(`${cat}. ${main.value}（${method.value}）`);
+                    } else {
+                        // 沒有烹調方法的菜式，不顯示（未選）
+                        selectedItems.push(`${cat}. ${main.value}`);
+                    }
                 }
             });
 
@@ -664,15 +681,20 @@
             const date = document.getElementById('bookingDate').value || '未填寫';
             const pax = document.getElementById('pax').value || '0';
 
-            let summary = `禤師傅私房菜 精選套餐預訂\n\n`;
+            let summary = `【重要提醒】
+請將以下訂單摘要直接傳送至我們的 WhatsApp
+我們會盡快回覆確認，此程序並不代表訂位已成功，謝謝！
+
+`;
+
             summary += `價位：${price} / 人（${version}）\n`;
             summary += `人數：${pax}\n`;
             summary += `日期：${date}\n\n`;
             summary += `【已選菜式】\n`;
             selectedItems.forEach(item => summary += `${item}\n`);
             summary += `\n【注意事項】\n`;
-            summary += `• A類別（龍蝦 / 瀨尿蝦）大小會有市場調整價\n`;
-            summary += `• 預約訂金：$500–1000（FPS / PayMe）\n\n`;
+            summary += `• A類別（龍蝦 / 瀨尿蝦）可以選擇升級較大尺寸，歡迎查詢\n`;
+            summary += `• 預約訂金：$500–1000（FPS）\n\n`;
             summary += `姓名：${name}\n`;
             summary += `電話：${phone}\n`;
 
