@@ -201,12 +201,12 @@
 
         function selectTier(tier) {
             selectedTier = tier;
-            
+
             // === GA4 事件追蹤：記錄使用者開始使用配置器 ===
             gtag('event', 'configurator_start', {
                 'tier': tier === 1 ? '458' : '558'
             });
-            
+
             document.getElementById('tier1').classList.add('dimmed');
             document.getElementById('tier2').classList.add('dimmed');
             document.getElementById('tier' + tier).classList.remove('dimmed');
@@ -463,6 +463,12 @@
 
             if (mainRadio) {
                 const mainValue = mainRadio.value;
+                
+                // === GA4 事件追蹤：記錄使用者選擇了哪個類別 ===
+                gtag('event', 'category_selected', {
+                    'category': category,
+                    'item_name': mainValue
+                });
 
                 // 決定正確的 method name 和 methods container id
                 let methodName = mainValue + '-method';
