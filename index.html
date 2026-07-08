@@ -80,7 +80,7 @@
 
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-900">禤師傅私房菜</h1>
-            <p class="text-gray-600 mt-1">精選套餐配置器（最少 2 人起）</p>
+            <p class="text-gray-600 mt-1">精選套餐配置器（最少 4 人起）</p>
         </div>
 
         <!-- SECTION A: 價位選擇 -->
@@ -111,7 +111,7 @@
                     <div class="mt-2"><span class="text-2xl font-semibold text-gray-800">共 7 款</span></div>
                     <div class="mt-4 text-sm text-gray-600 font-medium leading-tight">
                         A、B、C、D、E 各選 1 項<br>
-                        + 額外 B 及 C 各 1 項<br>
+                        + 額外 C 及 D 各 1 項<br>
                         <span class="text-xs text-orange-600">（多 2 道菜，適合 6 人以上或想食得豐富）</span>
                     </div>
                 </div>
@@ -688,6 +688,8 @@
 `;
 
             summary += `價位：${price} / 人（${version}）\n`;
+            summary += `姓名：${name}\n`;
+            summary += `電話：${phone}\n`;
             summary += `人數：${pax}\n`;
             summary += `日期：${date}\n\n`;
             summary += `【已選菜式】\n`;
@@ -695,8 +697,6 @@
             summary += `\n【注意事項】\n`;
             summary += `• A類別（龍蝦 / 瀨尿蝦）可以選擇升級較大尺寸，歡迎查詢\n`;
             summary += `• 預約訂金：$500–1000（FPS）\n\n`;
-            summary += `姓名：${name}\n`;
-            summary += `電話：${phone}\n`;
 
             // === GA4 事件追蹤：記錄使用者生成訂單摘要 ===
             gtag('event', 'summary_generated', {
