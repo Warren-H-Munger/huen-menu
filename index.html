@@ -14,7 +14,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>禤師傅私房菜 • 精選套餐</title>
+    <title>精選套餐•禤師傅私房菜</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -244,6 +244,11 @@
                             </label>
                         </div>
 
+                        <div class="mb-3 pl-3 border-l-4 border-orange-400 bg-orange-50/60 rounded-r-lg py-2">
+                        <div class="font-bold text-orange-700 text-sm mb-1.5 flex items-center gap-1.5">
+                        升級專區（另加當日市價）
+                        </div>
+
                         <label class="menu-row cursor-pointer">
                             <input type="radio" name="A-main" value="皇牌巨型瀨尿蝦" class="mr-3 w-4 h-4" onchange="selectMainItem(this, 'A')">
                             <span class="font-medium">皇牌巨型瀨尿蝦</span>
@@ -255,6 +260,7 @@
                             <label class="flex items-center gap-2 cursor-pointer pl-1">
                                 <input type="radio" name="瀨尿蝦-method" class="w-4 h-4" value="避風塘" onchange="updateCategoryStatus('A')"><span>避風塘</span>
                             </label>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -623,7 +629,7 @@
             }
 
             const price = selectedTier === 1 ? "$458" : "$558";
-            const version = selectedTier === 1 ? "基礎版（5道菜）" : "升級版（7道菜）";
+            const version = selectedTier === 1 ? "5道菜" : "7道菜";
 
             let selectedItems = [];
 
@@ -696,7 +702,7 @@
             summary += `【已選菜式】\n`;
             selectedItems.forEach(item => summary += `${item}\n`);
             summary += `\n【注意事項】\n`;
-            summary += `• A類別（龍蝦 / 瀨尿蝦）可以選擇升級較大尺寸，歡迎查詢\n`;
+            summary += `• A類別（瀨尿蝦）為加錢升級項目，價格會按當天市價調整\n`;
             summary += `• 預約訂金：$500–1000（FPS）\n\n`;
 
             // === GA4 事件追蹤：記錄使用者生成訂單摘要 ===
