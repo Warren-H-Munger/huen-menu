@@ -690,7 +690,7 @@
             let summary = `【重要提醒】
 此程序並不代表訂位成功
 請將訂單摘要直接傳送至我們的 WhatsApp
-我們會盡快回覆確，認謝謝！
+我們會盡快回覆確認，謝謝！
 
 `;
 
@@ -703,7 +703,7 @@
             selectedItems.forEach(item => summary += `${item}\n`);
             summary += `\n【注意事項】\n`;
             summary += `• A類別（瀨尿蝦）為加錢升級項目，價格會按當天市價調整\n`;
-            summary += `• 預約訂金：$500–1000（FPS）\n\n`;
+            summary += `• 預約訂金：$500–1000（FPS）\n`;
 
             // === GA4 事件追蹤：記錄使用者生成訂單摘要 ===
             gtag('event', 'summary_generated', {
